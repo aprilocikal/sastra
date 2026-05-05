@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Feather, LogOut, User } from 'lucide-react';
+import { Feather, LogOut, User, Menu, X } from 'lucide-react';
 
 const Navbar = ({ user, onLogout }) => {
   const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const navLinks = [
     { name: 'Beranda', path: '/' },
@@ -37,6 +38,7 @@ const Navbar = ({ user, onLogout }) => {
           </div>
         </Link>
         
+        {/* Desktop Links */}
         <div className="nav-links">
           {navLinks.map((link) => (
             <Link 
@@ -51,17 +53,7 @@ const Navbar = ({ user, onLogout }) => {
 
         {user ? (
           <div className="flex" style={{ gap: '0.75rem' }}>
-            <div className="flex" style={{ gap: '0.5rem', padding: '0.4rem 0.8rem 0.4rem 0.5rem', background: 'var(--bg-elevated)', borderRadius: '9999px', border: '1px solid var(--border)' }}>
-              <div style={{ 
-                width: '28px', height: '28px', borderRadius: '50%', 
-                background: 'linear-gradient(135deg, var(--accent), #FF8A65)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#fff', fontSize: '0.65rem', fontWeight: 700
-              }}>
-                {user.name?.charAt(0).toUpperCase()}
-              </div>
-              <span style={{ fontSize: '0.8rem', fontWeight: 600, maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.name}</span>
-            </div>
+
             <button onClick={onLogout} style={{ 
               width: '34px', height: '34px', borderRadius: '50%', 
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -73,6 +65,31 @@ const Navbar = ({ user, onLogout }) => {
         ) : (
           <Link to="/login" className="nav-cta">
             <User size={14} />
+            Masuk
+          </Link>
+        )}
+
+        {/* Mobile Menu Button */}
+        <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      <div className={`mobile-menu-overlay ${isMobileMenuOpen ? 'open' : ''}`}>
+        {navLinks.map((link) => (
+          <Link 
+            key={link.path} 
+            to={link.path} 
+            onClick={() => setIsMobileMenuOpen(false)}
+            className={`nav-link ${location.pathname === link.path ? 'active' : ''}`}
+            style={{ fontSize: '1.25rem', fontWeight: 700 }}
+          >
+            {link.name}
+          </Link>
+        ))}
+        {!user && (
+          <Link to="/login" className="btn btn-primary" onClick={() => setIsMobileMenuOpen(false)} style={{ marginTop: '1rem', justifyContent: 'center' }}>
             Masuk
           </Link>
         )}

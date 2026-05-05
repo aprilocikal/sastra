@@ -18,7 +18,7 @@ const ContentCard = ({ content }) => {
           alt={content.title} 
           style={{ 
             width: '100%', 
-            height: '200px', 
+            aspectRatio: '4/3', 
             objectFit: 'cover', 
             borderRadius: 'var(--radius-lg)',
             transition: 'var(--transition-slow)',
@@ -42,18 +42,18 @@ const ContentCard = ({ content }) => {
         {content.summary}
       </p>
       
-      <div className="flex" style={{ justifyContent: 'space-between', paddingTop: '1rem', borderTop: '1px solid var(--border)', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-        <div className="flex" style={{ gap: '0.4rem' }}>
-          <User size={13} />
-          <span>{content.author}</span>
+      <div className="flex" style={{ justifyContent: 'space-between', flexWrap: 'wrap', paddingTop: '1rem', borderTop: '1px solid var(--border)', fontSize: '0.75rem', color: 'var(--text-muted)', gap: '0.5rem' }}>
+        <div className="flex" style={{ gap: '0.4rem', flexShrink: 1, minWidth: 0 }}>
+          <User size={12} style={{ flexShrink: 0 }} />
+          <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '70px' }}>{content.author}</span>
         </div>
-        <div className="flex" style={{ gap: '0.75rem' }}>
-          <div className="flex" style={{ gap: '0.25rem' }}>
-            <TrendingUp size={13} color="var(--accent)" />
+        <div className="flex" style={{ gap: '0.6rem', flexShrink: 0 }}>
+          <div className="flex" style={{ gap: '0.2rem' }}>
+            <TrendingUp size={12} color="var(--accent)" />
             <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{content.impact_score}</span>
           </div>
-          <div className="flex" style={{ gap: '0.25rem' }}>
-            <Eye size={13} />
+          <div className="flex" style={{ gap: '0.2rem' }}>
+            <Eye size={12} />
             <span>{content.views?.toLocaleString()}</span>
           </div>
         </div>

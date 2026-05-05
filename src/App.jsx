@@ -59,8 +59,14 @@ const AppLayout = ({ user, onLogin, onLogout }) => {
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
+    // Initial splash screen timer
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2800);
+
     // Check current session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -72,7 +78,10 @@ function App() {
       setUser(session?.user ?? null);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timer);
+    };
   }, []);
 
   const handleLogin = (userData) => {
@@ -93,9 +102,38 @@ function App() {
   }
 
   return (
-    <Router>
-      <AppLayout user={user} onLogin={handleLogin} onLogout={handleLogout} />
-    </Router>
+    <>
+      <div className={`splash-screen ${!showSplash ? 'hide' : ''}`}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2.5rem' }}>
+          <div className="splash-logo">
+            <div style={{ 
+              width: '64px', height: '64px', borderRadius: '50%', 
+              background: 'var(--accent)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 8px 32px rgba(255, 87, 51, 0.3)'
+            }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
+                <line x1="16" y1="8" x2="2" y2="22"></line>
+                <line x1="17.5" y1="15" x2="9" y2="15"></line>
+              </svg>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span className="splash-text">SASTRA</span>
+              <span style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Satu Aksara Bangsa</span>
+            </div>
+          </div>
+          
+          <div className="splash-progress">
+            <div className="splash-progress-bar"></div>
+          </div>
+        </div>
+      </div>
+
+      <Router>
+        <AppLayout user={user} onLogin={handleLogin} onLogout={handleLogout} />
+      </Router>
+    </>
   );
 }
 
