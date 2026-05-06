@@ -1,11 +1,82 @@
 const BASE_URL = 'https://www.googleapis.com/books/v1/volumes';
 
+const getFallbackData = (count) => {
+  const templates = [
+    {
+      title: 'Filsafat Pendidikan Nasional',
+      category: 'Edukasi',
+      topic: 'Filsafat',
+      author: 'Ki Hajar Dewantara',
+      thumbnail: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=800'
+    },
+    {
+      title: 'Teknologi Digital & Masyarakat',
+      category: 'Teknologi',
+      topic: 'Digital',
+      author: 'Budi Raharjo',
+      thumbnail: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=800'
+    },
+    {
+      title: 'Sosiologi Modern',
+      category: 'Sosial',
+      topic: 'Sosiologi',
+      author: 'Selo Soemardjan',
+      thumbnail: 'https://images.unsplash.com/photo-1455390582262-044cdead2708?auto=format&fit=crop&q=80&w=800'
+    },
+    {
+      title: 'Seni & Budaya Nusantara',
+      category: 'Budaya',
+      topic: 'Seni',
+      author: 'Tim Budaya',
+      thumbnail: 'https://images.unsplash.com/photo-1459908676235-d5f02a50184b?auto=format&fit=crop&q=80&w=800'
+    },
+    {
+      title: 'Pemikiran Kritis di Era Informasi',
+      category: 'Edukasi',
+      topic: 'Literasi',
+      author: 'Rina Wijaya',
+      thumbnail: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=800'
+    },
+    {
+      title: 'Revolusi Industri 4.0',
+      category: 'Teknologi',
+      topic: 'Industri',
+      author: 'Ahmad Fauzi',
+      thumbnail: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=800'
+    }
+  ];
+
+  return Array.from({ length: count }).map((_, index) => {
+    const template = templates[index % templates.length];
+    return {
+      id: `fallback-${index}`,
+      title: template.title,
+      description: 'Deskripsi lengkap untuk konten ini belum tersedia secara offline, ini adalah data simulasi karena API limit.',
+      category: template.category,
+      topic: template.topic,
+      format: index % 2 === 0 ? 'Buku' : 'Artikel',
+      difficulty: 'Menengah',
+      author: template.author,
+      created_at: '2024',
+      content_body: 'Konten lengkap simulasi offline.',
+      summary: 'Data ini adalah data fallback yang muncul karena limit kuota Google Books API telah tercapai...',
+      impact_score: Math.floor(Math.random() * 20) + 80,
+      views: Math.floor(Math.random() * 5000) + 500,
+      tags: [template.topic.toLowerCase(), template.category.toLowerCase()],
+      thumbnail: template.thumbnail
+    };
+  });
+};
+
 export const fetchBooks = async (query = 'pendidikan indonesia filsafat', maxResults = 10) => {
   try {
     const response = await fetch(`${BASE_URL}?q=${encodeURIComponent(query)}&maxResults=${maxResults}`);
     const data = await response.json();
     
-    if (!data.items) return [];
+    if (!data.items) {
+      console.warn("Google API returned no items or quota exceeded. Using fallback data.");
+      return getFallbackData(maxResults);
+    }
 
     return data.items.map(item => ({
       id: item.id,
@@ -26,7 +97,7 @@ export const fetchBooks = async (query = 'pendidikan indonesia filsafat', maxRes
     }));
   } catch (error) {
     console.error('Error fetching books:', error);
-    return [];
+    return getFallbackData(maxResults);
   }
 };
 
@@ -34,6 +105,10 @@ export const fetchBookById = async (id) => {
   try {
     const response = await fetch(`${BASE_URL}/${id}`);
     const item = await response.json();
+    
+    if (item.error || !item.id) {
+      return getFallbackData(1)[0];
+    }
     
     return {
       id: item.id,
@@ -54,6 +129,6 @@ export const fetchBookById = async (id) => {
     };
   } catch (error) {
     console.error('Error fetching book details:', error);
-    return null;
+    return getFallbackData(1)[0];
   }
 };
